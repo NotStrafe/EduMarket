@@ -16,9 +16,11 @@ router = APIRouter(prefix="/orders", tags=["orders"])
 @router.post("", response_model=OrderRead, status_code=status.HTTP_201_CREATED)
 async def create_order(payload: OrderCreate, db: AsyncSession = Depends(get_db)) -> OrderRead:
     if not payload.items:
-        raise HTTPException(status_code=400, detail="Order must contain at least one item")
+        raise HTTPException(
+            status_code=400, detail="Order must contain at least one item")
 
-    order = models.Order(user_id=payload.user_id, status="pending", total_amount=Decimal("0"))
+    order = models.Order(user_id=payload.user_id,
+                         status="pending", total_amount=Decimal("0"))
     db.add(order)
     await db.flush()
 
@@ -27,7 +29,8 @@ async def create_order(payload: OrderCreate, db: AsyncSession = Depends(get_db))
         course = await db.get(models.Course, item.course_id)
         if not course:
             await db.rollback()
-            raise HTTPException(status_code=404, detail=f"Course {item.course_id} not found")
+            raise HTTPException(
+                status_code=404, detail=f"Course {item.course_id} not found")
         total += course.price * item.quantity
         db.add(
             models.OrderItem(

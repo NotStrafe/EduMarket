@@ -2,15 +2,15 @@ from pathlib import Path
 
 from app.db.session import engine
 from app.db.base import Base
-# Import models so they are registered with metadata
-from app import models  # noqa: F401
+from app import models
 
 
 async def init_db() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
         await _apply_sql_file(
-            conn, Path(__file__).resolve().parents[2] / "sql" / "002_functions_triggers_views.sql"
+            conn, Path(__file__).resolve(
+            ).parents[2] / "sql" / "002_functions_triggers_views.sql"
         )
 
 
@@ -30,7 +30,7 @@ def _split_sql(sql_text: str) -> list[str]:
     in_dollar = False
     i = 0
     while i < len(sql_text):
-        if sql_text[i : i + 2] == "$$":
+        if sql_text[i: i + 2] == "$$":
             in_dollar = not in_dollar
             buf.append("$$")
             i += 2

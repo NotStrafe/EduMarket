@@ -6,7 +6,8 @@ from pydantic import BaseModel, Field
 class EnrollmentCreate(BaseModel):
     user_id: int
     course_id: int
-    status: str = Field(default="active", pattern="^(active|completed|cancelled)$")
+    status: str = Field(
+        default="active", pattern="^(active|completed|cancelled)$")
     started_at: datetime | None = None
     completed_at: datetime | None = None
 

@@ -34,7 +34,8 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(
+        String(255), unique=True, nullable=False)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     role_id: Mapped[int] = mapped_column(
@@ -52,7 +53,8 @@ class User(Base):
 
     role: Mapped["Role"] = relationship(back_populates="users")
     courses: Mapped[list["Course"]] = relationship(back_populates="author")
-    enrollments: Mapped[list["Enrollment"]] = relationship(back_populates="user")
+    enrollments: Mapped[list["Enrollment"]
+                        ] = relationship(back_populates="user")
     orders: Mapped[list["Order"]] = relationship(back_populates="user")
     reviews: Mapped[list["Review"]] = relationship(back_populates="user")
 
@@ -71,7 +73,8 @@ class Course(Base):
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     description: Mapped[str | None] = mapped_column(Text)
     price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
-    status: Mapped[str] = mapped_column(String(20), nullable=False, server_default="draft")
+    status: Mapped[str] = mapped_column(
+        String(20), nullable=False, server_default="draft")
     author_id: Mapped[int | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL")
     )
@@ -104,15 +107,18 @@ class Course(Base):
     lessons: Mapped[list["Lesson"]] = relationship(
         back_populates="course", cascade="all, delete-orphan"
     )
-    enrollments: Mapped[list["Enrollment"]] = relationship(back_populates="course")
-    order_items: Mapped[list["OrderItem"]] = relationship(back_populates="course")
+    enrollments: Mapped[list["Enrollment"]
+                        ] = relationship(back_populates="course")
+    order_items: Mapped[list["OrderItem"]] = relationship(
+        back_populates="course")
     reviews: Mapped[list["Review"]] = relationship(back_populates="course")
 
 
 class CourseModule(Base):
     __tablename__ = "course_modules"
     __table_args__ = (
-        UniqueConstraint("course_id", "position", name="uq_course_modules_position"),
+        UniqueConstraint("course_id", "position",
+                         name="uq_course_modules_position"),
     )
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
@@ -150,13 +156,15 @@ class Lesson(Base):
 
     course: Mapped["Course"] = relationship(back_populates="lessons")
     module: Mapped["CourseModule"] = relationship(back_populates="lessons")
-    progresses: Mapped[list["Progress"]] = relationship(back_populates="lesson")
+    progresses: Mapped[list["Progress"]] = relationship(
+        back_populates="lesson")
 
 
 class Enrollment(Base):
     __tablename__ = "enrollments"
     __table_args__ = (
-        UniqueConstraint("user_id", "course_id", name="uq_enrollments_user_course"),
+        UniqueConstraint("user_id", "course_id",
+                         name="uq_enrollments_user_course"),
         CheckConstraint(
             "status IN ('active','completed','cancelled')",
             name="ck_enrollments_status_valid",
@@ -174,15 +182,18 @@ class Enrollment(Base):
     status: Mapped[str] = mapped_column(
         String(20), nullable=False, server_default="active"
     )
-    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    started_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True))
+    completed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
     user: Mapped["User"] = relationship(back_populates="enrollments")
     course: Mapped["Course"] = relationship(back_populates="enrollments")
-    progresses: Mapped[list["Progress"]] = relationship(back_populates="enrollment")
+    progresses: Mapped[list["Progress"]] = relationship(
+        back_populates="enrollment")
 
 
 class Progress(Base):
@@ -208,7 +219,8 @@ class Progress(Base):
         String(20), nullable=False, server_default="not_started"
     )
     score: Mapped[int | None] = mapped_column(Integer)
-    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    completed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
@@ -216,7 +228,8 @@ class Progress(Base):
         nullable=False,
     )
 
-    enrollment: Mapped["Enrollment"] = relationship(back_populates="progresses")
+    enrollment: Mapped["Enrollment"] = relationship(
+        back_populates="progresses")
     lesson: Mapped["Lesson"] = relationship(back_populates="progresses")
 
 
@@ -256,8 +269,10 @@ class Order(Base):
 class OrderItem(Base):
     __tablename__ = "order_items"
     __table_args__ = (
-        CheckConstraint("quantity > 0", name="ck_order_items_quantity_positive"),
-        CheckConstraint("price >= 0", name="ck_order_items_price_non_negative"),
+        CheckConstraint(
+            "quantity > 0", name="ck_order_items_quantity_positive"),
+        CheckConstraint(
+            "price >= 0", name="ck_order_items_price_non_negative"),
         UniqueConstraint(
             "order_id", "course_id", name="uq_order_items_order_course_unique"
         ),
@@ -270,7 +285,8 @@ class OrderItem(Base):
     course_id: Mapped[int] = mapped_column(
         ForeignKey("courses.id", ondelete="RESTRICT"), nullable=False
     )
-    quantity: Mapped[int] = mapped_column(Integer, nullable=False, server_default="1")
+    quantity: Mapped[int] = mapped_column(
+        Integer, nullable=False, server_default="1")
     price: Mapped[Decimal] = mapped_column(
         Numeric(10, 2), nullable=False, server_default="0"
     )
@@ -313,8 +329,10 @@ class Payment(Base):
 class Review(Base):
     __tablename__ = "reviews"
     __table_args__ = (
-        UniqueConstraint("user_id", "course_id", name="uq_reviews_user_course"),
-        CheckConstraint("rating BETWEEN 1 AND 5", name="ck_reviews_rating_valid"),
+        UniqueConstraint("user_id", "course_id",
+                         name="uq_reviews_user_course"),
+        CheckConstraint("rating BETWEEN 1 AND 5",
+                        name="ck_reviews_rating_valid"),
         Index("ix_reviews_course_rating", "course_id", "rating"),
     )
 
@@ -373,8 +391,10 @@ class ImportJob(Base):
     total_records: Mapped[int | None] = mapped_column(Integer)
     processed_records: Mapped[int | None] = mapped_column(Integer)
     errors_count: Mapped[int | None] = mapped_column(Integer)
-    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    started_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True))
+    finished_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -399,4 +419,3 @@ class ImportJobError(Base):
     )
 
     job: Mapped["ImportJob"] = relationship(back_populates="errors")
-

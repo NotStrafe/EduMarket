@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Load .env early so pydantic can pick variables up in any runtime
+
 load_dotenv()
 
 

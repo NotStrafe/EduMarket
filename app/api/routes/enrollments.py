@@ -18,7 +18,8 @@ async def create_enrollment(payload: EnrollmentCreate, db: AsyncSession = Depend
         await db.commit()
     except IntegrityError:
         await db.rollback()
-        raise HTTPException(status_code=409, detail="Enrollment already exists or invalid references")
+        raise HTTPException(
+            status_code=409, detail="Enrollment already exists or invalid references")
     await db.refresh(enrollment)
     return enrollment
 

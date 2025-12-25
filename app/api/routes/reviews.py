@@ -18,7 +18,8 @@ async def create_review(payload: ReviewCreate, db: AsyncSession = Depends(get_db
         await db.commit()
     except IntegrityError:
         await db.rollback()
-        raise HTTPException(status_code=409, detail="Review already exists or invalid references")
+        raise HTTPException(
+            status_code=409, detail="Review already exists or invalid references")
     await db.refresh(review)
     return review
 

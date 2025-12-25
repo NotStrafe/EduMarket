@@ -20,7 +20,8 @@ class CourseUpdate(BaseModel):
     title: str | None = Field(default=None, min_length=1, max_length=200)
     description: str | None = None
     price: Decimal | None = Field(default=None, ge=0)
-    status: str | None = Field(default=None, pattern="^(draft|published|archived)$")
+    status: str | None = Field(
+        default=None, pattern="^(draft|published|archived)$")
 
 
 class CourseRead(CourseBase):

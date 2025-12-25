@@ -1,15 +1,15 @@
-"""Seed the database with realistic demo data.
+"""Заполняет базу реалистичными демонстрационными данными.
 
-Usage: python scripts/seed_data.py
+Запуск: python scripts/seed_data.py
 
-Creates:
-- roles, users (admins/teachers/students with hashed passwords)
-- courses with modules/lessons
-- enrollments and progress
-- orders, order_items (~6000+), payments
-- reviews, import jobs/errors samples
+Создаёт:
+- роли и пользователей (админы/преподаватели/студенты с захешированными паролями);
+- курсы с модулями и уроками;
+- записи на курсы и прогресс;
+- заказы, позиции заказов (~6000+), платежи;
+- отзывы, примеры заданий импорта и ошибок.
 
-Idempotent for dev: truncates tables before insert (CASCADE).
+Для дев-окружения идемпотентен: перед вставкой делает TRUNCATE CASCADE.
 """
 
 import asyncio
@@ -33,7 +33,6 @@ NUM_ADMINS = 2
 NUM_TEACHERS = 15
 NUM_STUDENTS = 250
 NUM_COURSES = 50
-# 1700 orders * min 3 items ≈ 5100+ order_items to satisfy 5000+ transactional rows
 ORDERS_COUNT = 1700
 
 
@@ -72,12 +71,10 @@ async def seed_users(session, roles: dict[str, models.Role]):
             role_id=role.id,
         )
 
-    # Admins
     for idx in range(NUM_ADMINS):
         users.append(build_user(
             f"admin{idx+1}@example.com", f"Admin {idx+1}", roles["admin"]))
 
-    # Teachers
     for idx in range(NUM_TEACHERS):
         users.append(
             build_user(
@@ -87,7 +84,6 @@ async def seed_users(session, roles: dict[str, models.Role]):
             )
         )
 
-    # Students
     for idx in range(NUM_STUDENTS):
         users.append(
             build_user(
@@ -261,7 +257,8 @@ async def seed_orders_payments(session, students, courses):
         else:  # cancelled
             payment_status = "failed"
 
-        paid_at = datetime.utcnow() if payment_status in {"paid", "refunded"} else None
+        paid_at = datetime.utcnow() if payment_status in {
+            "paid", "refunded"} else None
         payments.append(
             models.Payment(
                 order_id=order.id,
