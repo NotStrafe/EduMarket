@@ -1,0 +1,33 @@
+from app.models.models import (
+    AuditLog,
+    Course,
+    CourseModule,
+    Enrollment,
+    ImportJob,
+    ImportJobError,
+    Lesson,
+    Order,
+    OrderItem,
+    Payment,
+    Progress,
+    Review,
+    Role,
+    User,
+)
+
+__all__ = [
+    "Role",
+    "User",
+    "Course",
+    "CourseModule",
+    "Lesson",
+    "Enrollment",
+    "Progress",
+    "Order",
+    "OrderItem",
+    "Payment",
+    "Review",
+    "AuditLog",
+    "ImportJob",
+    "ImportJobError",
+]
