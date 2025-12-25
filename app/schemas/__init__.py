@@ -9,6 +9,7 @@ from app.schemas.order import (
     PaymentRead,
 )
 from app.schemas.review import ReviewCreate, ReviewRead
+from app.schemas.report import TopCourseItem, UserActivityItem, SalesDynamicsItem
 
 __all__ = [
     "UserCreate",
@@ -25,4 +26,7 @@ __all__ = [
     "PaymentRead",
     "ReviewCreate",
     "ReviewRead",
+    "TopCourseItem",
+    "UserActivityItem",
+    "SalesDynamicsItem",
 ]

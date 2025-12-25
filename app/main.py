@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.api.routes import courses, enrollments, orders, reviews, users
+from app.api.routes import courses, enrollments, orders, reports, reviews, users
 from app.core.config import settings
 from app.db.init_db import init_db
 
@@ -41,6 +41,7 @@ def register_routes(app: FastAPI) -> None:
     app.include_router(enrollments.router, prefix="/api")
     app.include_router(orders.router, prefix="/api")
     app.include_router(reviews.router, prefix="/api")
+    app.include_router(reports.router, prefix="/api")
 
 
 app = create_application()

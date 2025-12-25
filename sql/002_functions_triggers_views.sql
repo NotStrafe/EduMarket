@@ -200,10 +200,10 @@ BEGIN
     RETURN QUERY
     SELECT
         c.id,
-        c.title,
+        c.title::TEXT,
         COALESCE(SUM(CASE WHEN p.status = 'refunded' THEN -p.amount ELSE p.amount END), 0) AS revenue,
-        COUNT(DISTINCT o.id) AS orders_count,
-        COUNT(p.id) AS payments_count
+        COUNT(DISTINCT o.id)::INT AS orders_count,
+        COUNT(p.id)::INT AS payments_count
     FROM courses c
     JOIN order_items oi ON oi.course_id = c.id
     JOIN orders o ON o.id = oi.order_id
@@ -227,20 +227,20 @@ RETURNS TABLE (
 BEGIN
     RETURN QUERY
     SELECT
-        u.id,
-        u.email,
-        COALESCE(enr.cnt, 0) AS enrollments_count,
-        COALESCE(pr.cnt, 0) AS lessons_completed,
-        COALESCE(pay.cnt, 0) AS payments_count
+        u.id AS user_id,
+        u.email::TEXT AS email,
+        COALESCE(enr.enrollments_count, 0)::INT AS enrollments_count,
+        COALESCE(pr.lessons_completed, 0)::INT AS lessons_completed,
+        COALESCE(pay.payments_count, 0)::INT AS payments_count
     FROM users u
     LEFT JOIN (
-        SELECT user_id, COUNT(*) AS cnt
-        FROM enrollments
-        WHERE created_at BETWEEN p_start AND p_end
-        GROUP BY user_id
+        SELECT e.user_id, COUNT(*)::INT AS enrollments_count
+        FROM enrollments e
+        WHERE e.created_at BETWEEN p_start AND p_end
+        GROUP BY e.user_id
     ) enr ON enr.user_id = u.id
     LEFT JOIN (
-        SELECT e.user_id, COUNT(*) AS cnt
+        SELECT e.user_id, COUNT(*)::INT AS lessons_completed
         FROM progresses pr
         JOIN enrollments e ON e.id = pr.enrollment_id
         WHERE pr.status = 'completed'
@@ -248,7 +248,7 @@ BEGIN
         GROUP BY e.user_id
     ) pr ON pr.user_id = u.id
     LEFT JOIN (
-        SELECT o.user_id, COUNT(*) AS cnt
+        SELECT o.user_id, COUNT(*)::INT AS payments_count
         FROM payments p
         JOIN orders o ON o.id = p.order_id
         WHERE p.paid_at BETWEEN p_start AND p_end
@@ -271,8 +271,8 @@ BEGIN
     SELECT
         date_trunc('month', p.paid_at)::DATE AS period_start,
         COALESCE(SUM(CASE WHEN p.status = 'refunded' THEN -p.amount ELSE p.amount END), 0) AS revenue,
-        COUNT(DISTINCT o.id) AS orders_count,
-        COUNT(p.id) AS payments_count
+        COUNT(DISTINCT o.id)::INT AS orders_count,
+        COUNT(p.id)::INT AS payments_count
     FROM payments p
     JOIN orders o ON o.id = p.order_id
     WHERE p.paid_at BETWEEN p_start AND p_end
