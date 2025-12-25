@@ -33,7 +33,8 @@ async def enqueue_import(
         await db.commit()
     except IntegrityError:
         await db.rollback()
-        raise HTTPException(status_code=400, detail="Failed to create import job")
+        raise HTTPException(
+            status_code=400, detail="Failed to create import job")
     await db.refresh(job)
 
     background_tasks.add_task(_process_job, job.id)
@@ -60,7 +61,8 @@ async def list_job_errors(job_id: int, db: AsyncSession = Depends(get_db)) -> li
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     result = await db.execute(
-        select(models.ImportJobError).where(models.ImportJobError.job_id == job_id).order_by(models.ImportJobError.id)
+        select(models.ImportJobError).where(
+            models.ImportJobError.job_id == job_id).order_by(models.ImportJobError.id)
     )
     return result.scalars().all()
 
