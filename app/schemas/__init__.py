@@ -10,6 +10,7 @@ from app.schemas.order import (
 )
 from app.schemas.review import ReviewCreate, ReviewRead
 from app.schemas.report import TopCourseItem, UserActivityItem, SalesDynamicsItem
+from app.schemas.import_job import ImportJobCreate, ImportJobRead, ImportJobErrorRead
 
 __all__ = [
     "UserCreate",
@@ -29,4 +30,7 @@ __all__ = [
     "TopCourseItem",
     "UserActivityItem",
     "SalesDynamicsItem",
+    "ImportJobCreate",
+    "ImportJobRead",
+    "ImportJobErrorRead",
 ]
