@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from app.api.routes import courses, enrollments, orders, reviews, users
 from app.core.config import settings
 from app.db.init_db import init_db
 
@@ -13,6 +14,7 @@ def create_application() -> FastAPI:
     )
     register_events(app)
     register_healthcheck(app)
+    register_routes(app)
     return app
 
 
@@ -31,6 +33,14 @@ def register_events(app: FastAPI) -> None:
     @app.on_event("startup")
     async def on_startup() -> None:
         await init_db()
+
+
+def register_routes(app: FastAPI) -> None:
+    app.include_router(users.router, prefix="/api")
+    app.include_router(courses.router, prefix="/api")
+    app.include_router(enrollments.router, prefix="/api")
+    app.include_router(orders.router, prefix="/api")
+    app.include_router(reviews.router, prefix="/api")
 
 
 app = create_application()
